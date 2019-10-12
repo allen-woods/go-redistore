@@ -115,11 +115,14 @@ func TestGoRediStore(t *testing.T) {
 
 		fmt.Printf("\nFound Address: %s\n", addr)
 
-		store, err := NewGoRediStore(10, "tcp", addr, "", []byte("secret-key"))
+		store, err := NewGoRediStore(10, "tcp", addr, "", []byte("session-key"))
+
+		fmt.Printf("\nstore is:\n\n%#v\n\n", store)
+
 		if err != nil {
 			t.Fatal(err.Error())
 		}
-		defer store.Close()
+		defer store.Client.Close()
 
 		req, _ := http.NewRequest("GET", "http://localhost:8080/", nil)
 		rsp = NewRecorder()
@@ -127,6 +130,9 @@ func TestGoRediStore(t *testing.T) {
 		if session, err = store.Get(req, "session-key"); err != nil {
 			t.Fatalf("Error getting session: %v", err)
 		}
+
+		fmt.Printf("\nsession is:\n\n%#v\n\n", session)
+
 		// Get a flash.
 		flashes = session.Flashes()
 		if len(flashes) != 0 {
@@ -152,7 +158,7 @@ func TestGoRediStore(t *testing.T) {
 	{
 
 		addr := setup()
-		store, err := NewGoRediStore(10, "tcp", addr, "", []byte("secret-key"))
+		store, err := NewGoRediStore(10, "tcp", addr, "", []byte("session-key"))
 		if err != nil {
 			t.Fatal(err.Error())
 		}
@@ -204,7 +210,7 @@ func TestGoRediStore(t *testing.T) {
 	// RedisStore
 	{
 		addr := setup()
-		store, err := NewGoRediStore(10, "tcp", addr, "", []byte("secret-key"))
+		store, err := NewGoRediStore(10, "tcp", addr, "", []byte("session-key"))
 		if err != nil {
 			t.Fatal(err.Error())
 		}
@@ -238,7 +244,7 @@ func TestGoRediStore(t *testing.T) {
 	// Custom type
 	{
 		addr := setup()
-		store, err := NewGoRediStore(10, "tcp", addr, "", []byte("secret-key"))
+		store, err := NewGoRediStore(10, "tcp", addr, "", []byte("session-key"))
 		if err != nil {
 			t.Fatal(err.Error())
 		}
@@ -300,7 +306,7 @@ func TestGoRediStore(t *testing.T) {
 
 	{
 		addr := setup()
-		store, err := NewGoRediStore(10, "tcp", addr, "", []byte("secret-key"))
+		store, err := NewGoRediStore(10, "tcp", addr, "", []byte("session-key"))
 		if err != nil {
 			t.Fatal(err.Error())
 		}
@@ -312,13 +318,13 @@ func TestGoRediStore(t *testing.T) {
 
 		session, err = store.New(req, "my session")
 		session.Values["big"] = make([]byte, base64.StdEncoding.DecodedLen(4096*2))
-		err = session.Save(req, w)
+		err = sessions.Save(req, w)
 		if err == nil {
 			t.Fatal("expected an error, got nil")
 		}
 
 		store.SetMaxLength(4096 * 3) // A bit more than the value size to account for encoding overhead.
-		err = session.Save(req, w)
+		err = sessions.Save(req, w)
 		if err != nil {
 			t.Fatal("failed to Save:", err)
 		}
@@ -329,7 +335,7 @@ func TestGoRediStore(t *testing.T) {
 	// RedisStoreWithDB
 	{
 		addr := setup()
-		store, err := NewGoRediStoreWithDB(10, "tcp", addr, "", 1, []byte("secret-key"))
+		store, err := NewGoRediStoreWithDB(10, "tcp", addr, "", 1, []byte("session-key"))
 		if err != nil {
 			t.Fatal(err.Error())
 		}
@@ -379,7 +385,7 @@ func TestGoRediStore(t *testing.T) {
 	// RedisStore
 	{
 		addr := setup()
-		store, err := NewGoRediStore(10, "tcp", addr, "", []byte("secret-key"))
+		store, err := NewGoRediStore(10, "tcp", addr, "", []byte("session-key"))
 		store.SetSerializer(JSONSerializer{})
 		if err != nil {
 			t.Fatal(err.Error())
@@ -426,7 +432,7 @@ func TestGoRediStore(t *testing.T) {
 }
 
 func TestPingGoodPort(t *testing.T) {
-	store, _ := NewGoRediStore(10, "tcp", ":6379", "", []byte("secret-key"))
+	store, _ := NewGoRediStore(10, "tcp", ":6379", "", []byte("session-key"))
 	defer store.Close()
 	ok, err := store.ping()
 	if err != nil {
@@ -438,7 +444,7 @@ func TestPingGoodPort(t *testing.T) {
 }
 
 func TestPingBadPort(t *testing.T) {
-	store, _ := NewGoRediStore(10, "tcp", ":6378", "", []byte("secret-key"))
+	store, _ := NewGoRediStore(10, "tcp", ":6378", "", []byte("session-key"))
 	defer store.Close()
 	_, err := store.ping()
 	if err == nil {
@@ -448,7 +454,7 @@ func TestPingBadPort(t *testing.T) {
 
 func ExampleGoRediStore() {
 	// RedisStore
-	store, err := NewGoRediStore(10, "tcp", ":6379", "", []byte("secret-key"))
+	store, err := NewGoRediStore(10, "tcp", ":6379", "", []byte("session-key"))
 	if err != nil {
 		panic(err)
 	}
