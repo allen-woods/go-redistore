@@ -154,9 +154,9 @@ func NewGoRediStore(size int, network, address, password string, keyPairs ...[]b
 		Addr:        address,
 		PoolSize:    size,
 		IdleTimeout: 240 * time.Second,
-		OnConnect: func(c *redis.Conn) error {
-			return c.ClientGetName().Err()
-		},
+		// OnConnect: func(c *redis.Conn) error {
+		// 	return c.ClientGetName().Err()
+		// },
 		Password: password,
 	})
 
@@ -171,9 +171,9 @@ func NewGoRediStoreWithDB(size int, network, address, password string, DB int, k
 		Addr:        address,
 		PoolSize:    size,
 		IdleTimeout: 240 * time.Second,
-		OnConnect: func(c *redis.Conn) error {
-			return c.ClientGetName().Err()
-		},
+		// OnConnect: func(c *redis.Conn) error {
+		// 	return c.ClientGetName().Err()
+		// },
 		Password: password,
 		DB:       DB,
 	})
@@ -284,8 +284,8 @@ func (s *GoRediStore) Delete(r *http.Request, w http.ResponseWriter, session *se
 func (s *GoRediStore) ping() (bool, error) {
 	conn := s.Client
 	defer conn.Close()
-	data, err := conn.Do("PING").Result()
-	if err != nil || data == nil {
+	data, err := conn.Do("PING").String()
+	if err != nil || data == "" {
 		return false, err
 	}
 	return (data == "PONG"), nil

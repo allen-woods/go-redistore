@@ -112,6 +112,9 @@ func TestGoRediStore(t *testing.T) {
 	{
 		// RedisStore
 		addr := setup()
+
+		fmt.Printf("\nFound Address: %s\n", addr)
+
 		store, err := NewGoRediStore(10, "tcp", addr, "", []byte("secret-key"))
 		if err != nil {
 			t.Fatal(err.Error())

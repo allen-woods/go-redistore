@@ -1,21 +1,24 @@
-language: go
+dist: trusty
 sudo: false
+language: go
 
 services:
   - redis-server
 
+go:
+  - 1.11.x
+  - 1.12.x
+  - tip
+
 matrix:
-  include:
-    - go: 1.13
-    - go: tip
   allow_failures:
     - go: tip
 
-install:
-  -  # skip
+env:
+  - GO111MODULE=on
 
 script:
   - go get -t -v ./...
   - diff -u <(echo -n) <(gofmt -d .)
-  - go tool vet .
+  - go vet .
   - go test -v -race ./...
