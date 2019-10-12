@@ -147,13 +147,7 @@ func (s *GoRediStore) SetMaxAge(v int) {
 
 // NewRediStore returns a new RediStore.
 // size: maximum number of idle connections.
-func NewRediStore(size int, network, address, password string, keyPairs ...[]byte) (*GoRediStore, error) {
-
-	// TestOnBorrow: func(c redis.Conn, t time.Time) error {
-	// 	_, err := c.Do("PING").Result()
-	// 	return err
-	// },
-
+func NewGoRediStore(size int, network, address, password string, keyPairs ...[]byte) (*GoRediStore, error) {
 	c := redis.NewClient(&redis.Options{
 		Network:     network,
 		Addr:        address,
@@ -165,12 +159,12 @@ func NewRediStore(size int, network, address, password string, keyPairs ...[]byt
 		Password: password,
 	})
 
-	return NewRediStoreWithPool(c, keyPairs...)
+	return NewGoRediStoreWithPool(c, keyPairs...)
 }
 
 // NewRediStoreWithDB - like NewRedisStore but accepts `DB` parameter to select
 // redis DB instead of using the default one ("0")
-func NewRediStoreWithDB(size int, network, address, password string, DB int, keyPairs ...[]byte) (*GoRediStore, error) {
+func NewGoRediStoreWithDB(size int, network, address, password string, DB int, keyPairs ...[]byte) (*GoRediStore, error) {
 	c := redis.NewClient(&redis.Options{
 		Network:     network,
 		Addr:        address,
@@ -182,11 +176,11 @@ func NewRediStoreWithDB(size int, network, address, password string, DB int, key
 		Password: password,
 		DB:       DB,
 	})
-	return NewRediStoreWithPool(c, keyPairs...)
+	return NewGoRediStoreWithPool(c, keyPairs...)
 }
 
 // NewRediStoreWithPool instantiates a RediStore with a *redis.Pool passed in.
-func NewRediStoreWithPool(client *redis.Client, keyPairs ...[]byte) (*GoRediStore, error) {
+func NewGoRediStoreWithPool(client *redis.Client, keyPairs ...[]byte) (*GoRediStore, error) {
 	rs := &GoRediStore{
 		// https://godoc.org/github.com/go-redis/redis#Client
 		Client: client,

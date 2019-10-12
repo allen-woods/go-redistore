@@ -1,0 +1,21 @@
+language: go
+sudo: false
+
+services:
+  - redis-server
+
+matrix:
+  include:
+    - go: 1.13
+    - go: tip
+  allow_failures:
+    - go: tip
+
+install:
+  -  # skip
+
+script:
+  - go get -t -v ./...
+  - diff -u <(echo -n) <(gofmt -d .)
+  - go tool vet .
+  - go test -v -race ./...
