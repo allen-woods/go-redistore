@@ -29,6 +29,7 @@ import (
 )
 
 // Amount of time for cookies/redis keys to expire.
+
 var sessionExpire = 86400 * 30
 
 // SessionSerializer provides an interface hook for alternative serializers
