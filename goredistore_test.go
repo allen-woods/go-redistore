@@ -446,7 +446,7 @@ func TestPingBadPort(t *testing.T) {
 	}
 }
 
-func ExampleRediStore() {
+func ExampleGoRediStore() {
 	// RedisStore
 	store, err := NewGoRediStore(10, "tcp", ":6379", "", []byte("secret-key"))
 	if err != nil {
